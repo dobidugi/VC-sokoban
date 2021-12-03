@@ -27,7 +27,26 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
+
+#define PLAYER 9
+#define NORMAL 0
+#define WALL 1
+#define KEY 2
+#define NOT_CLEAR 3
+#define CLEAR 4
+
+
+#define MOVE_UP 0
+#define MOVE_DOWN 1
+#define MOVE_LEFT 2
+#define MOVE_RIGHT 3
+
+
+
 vector<vector<int>> map;
+pair<int, int> player;
+
+
 void loadMap(int stage) {
     string file = to_string(stage) + ".dat";
     ifstream in;
@@ -63,7 +82,10 @@ void loadMap(int stage) {
                 break;
             else
             {
-                map[i][j++] = buff[k] -'0';
+                map[i][j] = buff[k] -'0';
+                if (map[i][j] == 9)
+                    player = { i, j };
+                j++;
             }
                
         }
@@ -190,10 +212,97 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 //
 
+bool outOfRange(int y, int x)
+{
+    if (y < 0 || y >= map.size() || x < 0 || x >= map.size()) return true;
+    return  false;
+}
+
+bool checkMovePlayer(int y, int x)
+{
+    if (map[y][x] == WALL || map[y][x] == NOT_CLEAR || map[y][x] == CLEAR) return false;
+    return true;
+}
+
+bool checkMoveKey(int y, int x)
+{
+    if (map[y][x] == WALL || map[y][x] == CLEAR ) return false;
+    return true;
+}
+
+void updatePlayerPosition(int y, int x)
+{
+    player = { y , x };
+}
+
+void move_player(int direction) 
+{
+    cout << "move_player" << direction << endl;
+    int dy[] = { -1, 1, 0, 0 };
+    int dx[] = { 0, 0, -1, 1 };
+   
+    int nowY = player.first;
+    int nowX = player.second;
+    cout << "현재 플레이어 위치" << nowY << " " << nowX << endl;
+    int ny = dy[direction] + nowY;
+    int nx = dx[direction] + nowX;
+
+    if (outOfRange(ny,nx)) return;
+    if (!checkMovePlayer(ny, nx)) return;
+    
+    if (map[ny][nx] == NORMAL)
+    {
+        map[nowY][nowX] = NORMAL;
+        map[ny][nx] = PLAYER;
+        player = { ny , nx };
+        updatePlayerPosition(ny, nx);
+    }
+      
+    else if (map[ny][nx] == KEY)
+    {
+        int nny = dy[direction] + ny;
+        int nnx = dx[direction] + nx;
+        if (outOfRange(nny, nnx)) return;
+        if (!checkMoveKey(nny, nnx)) return;
+        
+        if (map[nny][nnx] == NOT_CLEAR)
+            map[nny][nnx] = CLEAR;
+        else if(map[nny][nnx] == NORMAL)
+            map [nny][nnx] = KEY;
+        map[player.first][player.second] = NORMAL;
+        map[ny][nx] = PLAYER;
+        updatePlayerPosition(ny, nx);
+
+    }
+    
+}
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
+    case WM_KEYDOWN :
+    {
+        switch (wParam)
+        {
+        case VK_LEFT:
+            move_player(MOVE_LEFT);
+            break;
+
+        case VK_RIGHT:
+            move_player(MOVE_RIGHT);
+            break;
+        case VK_UP:
+            move_player(MOVE_UP);
+            break;
+        case VK_DOWN:
+            move_player(MOVE_DOWN);
+            break;
+        }
+
+        InvalidateRect(hWnd, NULL, true);
+    }
+    break;
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);
@@ -217,10 +326,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
             // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
-            HBRUSH wallBrush, normalBrush, humanBrush, keyBrush, doorBrush;
+            HBRUSH wallBrush, normalBrush, playerBrush, keyBrush, notClearBrush, clearBrush;
             wallBrush = CreateSolidBrush(RGB(100, 0, 0));
             normalBrush = CreateSolidBrush(RGB(255, 255, 255));
-            humanBrush = CreateSolidBrush(RGB(0, 0, 255));
+            playerBrush = CreateSolidBrush(RGB(0, 0, 255));
+            notClearBrush = CreateSolidBrush(RGB(255, 0, 0));
+            keyBrush = CreateSolidBrush(RGB(255, 255, 0));
+            clearBrush = CreateSolidBrush(RGB(0, 255, 0));
             int nX = 0;
             int nY = rectSize;
             int nTop = 0;
@@ -231,22 +343,36 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                    /* if (nowState == 1)
                         SelectObject(hdc, wallBrush);*/
                     int nowState = map[i - 1][j - 1];
-                    if (nowState == 1)
+                    if (nowState == WALL) // 벽 
                     {
                         SelectObject(hdc, wallBrush);
                         Rectangle(hdc, nX, nTop, nY, nBottom);
                     }
-                    else if(nowState == 0)
+                    else if(nowState == NORMAL) // 이동가능한곳
                     {
                         SelectObject(hdc, normalBrush);
                         Rectangle(hdc, nX, nTop, nY, nBottom);
                     }
-                    else if (nowState == 9)
+                    else if (nowState == PLAYER) // Player
                     {
-                        SelectObject(hdc, humanBrush);
+                        SelectObject(hdc, playerBrush);
                         Rectangle(hdc, nX, nTop, nY, nBottom);
                     }
-                        
+                    else if (nowState == KEY) // key
+                    {
+                        SelectObject(hdc, keyBrush);
+                        Rectangle(hdc, nX, nTop, nY, nBottom);
+                    }
+                    else if (nowState == NOT_CLEAR) // notClear
+                    {
+                        SelectObject(hdc, notClearBrush);
+                        Rectangle(hdc, nX, nTop, nY, nBottom);
+                    }
+                    else if (nowState == CLEAR) // clear
+                    {
+                        SelectObject(hdc, clearBrush);
+                        Rectangle(hdc, nX, nTop, nY, nBottom);
+                    }
                     nX = nX + rectSize;
                     nY = nY + rectSize;
                 }
@@ -258,7 +384,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             EndPaint(hWnd, &ps);
             DeleteObject(wallBrush);
             DeleteObject(normalBrush);
-            DeleteObject(humanBrush);
+            DeleteObject(playerBrush);
+            DeleteObject(keyBrush);
+            DeleteObject(notClearBrush);
+            DeleteObject(clearBrush);
         }
         break;
     case WM_DESTROY:
