@@ -3,17 +3,16 @@
 #include "Validator.h"
 #include "board.h";
 using namespace std;
-class player
+class Player
 {
 public:
-	player(Board* board, Validator* validaotr);
-	~player();
+	Player(Validator* validaotr);
+	~Player();
 	void moveLeft();
 	void moveRight();
 	void moveUp();
 	void moveDown();
 private:
-	Board* map;
 	Validator*  validator;
 	void move(int direction);
 };

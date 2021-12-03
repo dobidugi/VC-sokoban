@@ -49,7 +49,7 @@ INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
 
 Board*brd;
-player *ply;
+Player *player;
 vector<vector<int>> map;
 pair<int, int> user;
 pair<int, int> mapSize;
@@ -163,7 +163,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     brd = new Board();
     brd->loadStage(1);
     Validator* validator = new Validator(brd);
-    ply = new player(brd, validator);
+    player = new Player(validator);
  
     cout << "test" << endl;
     
@@ -345,21 +345,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         switch (wParam)
         {
         case VK_LEFT:
-            ply->moveLeft();
-            //move_user(MOVE_LEFT);
+            player->moveLeft();
             break;
 
         case VK_RIGHT:
-            ply->moveRight();
-            //move_user(MOVE_RIGHT);
+            player->moveRight();
             break;
         case VK_UP:
-            ply->moveUp();
-            //move_user(MOVE_UP);
+            player->moveUp();
             break;
         case VK_DOWN:
-            ply->moveDown();
-            //move_user(MOVE_DOWN);
+            player->moveDown();
             break;
         }
         clearCheck();

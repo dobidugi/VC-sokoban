@@ -27,7 +27,7 @@
     <ClInclude Include="final.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="player.h">
+    <ClInclude Include="Player.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Board.h">
@@ -44,14 +44,11 @@
     <ClCompile Include="final.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="player.cpp">
+    <ClCompile Include="Player.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Board.cpp">
       <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Direction.h">
-      <Filter>헤더 파일</Filter>
     </ClCompile>
     <ClCompile Include="Validator.cpp">
       <Filter>소스 파일</Filter>

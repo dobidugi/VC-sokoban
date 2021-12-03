@@ -1,50 +1,48 @@
 #include <iostream>
 #include "State.h"
-#include "player.h"
-#include "Direction.h"
+#include "Player.h"
 #include "Validator.h"
 
-player::player(Board *brd, Validator *validator)
+Player::Player(Validator *validator)
 {
-    this->map = brd;
     this->validator = validator;
 }
 
-player::~player()
+Player::~Player()
 {
 
 }
 
-void player::moveUp()
+void Player::moveUp()
 {
     this->move(0);
 }
 
-void player::moveDown()
+void Player::moveDown()
 {
     this->move(1);
 }
 
-void player::moveLeft()
+void Player::moveLeft()
 {
     this->move(2);
 }
 
-void player::moveRight()
+void Player::moveRight()
 {
     this->move(3);
 }
 
 
-void player::move(int direction)
+void Player::move(int direction)
 {
   
     int dy[] = { -1, 1, 0, 0 };
     int dx[] = { 0, 0, -1, 1 };
 
-    pair<int, int> playerPosition = this->map->getPlayerPosition();
-    int nowY = playerPosition.first;
-    int nowX = playerPosition.second;
+    pair<int, int> PlayerPosition = validator->getPlayerPosition();
+    int nowY = PlayerPosition.first;
+    int nowX = PlayerPosition.second;
     int ny = dy[direction] + nowY;
     int nx = dx[direction] + nowX;
     if (!validator->isMovePlayer(ny, nx)) return;
@@ -52,31 +50,32 @@ void player::move(int direction)
     if (validator->isNowPositionStateNormal(ny,nx))
     {
         validator->updateBoard(nowY, nowX, State::NORMAL);
-        //this->map->update(nowY, nowX, State::NORMAL);
         validator->updateBoard(ny, nx, State::PLAYER);
-        // this->map->update(ny, nx, State::PLAYER);
         validator->setPlayerPosition({ ny, nx });
-        //this->map->setPlayerPosition({ ny, nx });
     }
 
-    /*else if (map[ny][nx] == KEY)
+    else if (validator->isNowPositionStateKey(ny,nx))
     {
+  
         int nny = dy[direction] + ny;
         int nnx = dx[direction] + nx;
-        if (outOfRange(nny, nnx)) return;
-        if (!checkMoveKey(nny, nnx)) return;
-
-        if (map[nny][nnx] == NOT_CLEAR) {
-            map[nny][nnx] = CLEAR;
-            nowClearCount++;
+        if(!validator->isMoveKey(nny,nnx)) return ;
+        if (validator->isNowPositionStateNotClear(nny, nnx))
+        {
+            validator->updateBoard(nny, nnx, State::CLEAR);
+            //nowClearCount++;
         }
-        else if (map[nny][nnx] == NORMAL)
-            map[nny][nnx] = KEY;
-        map[user.first][user.second] = NORMAL;
-        map[ny][nx] = PLAYER;
-        updatePlayerPosition(ny, nx);
 
-    }*/
+        else if (validator->isNowPositionStateNormal(nny, nnx))
+        {
+            validator->updateBoard(nny, nnx, State::KEY);
+        }
+
+        validator->updateBoard(nowY, nowX, State::NORMAL);
+        validator->updateBoard(ny, nx, State::PLAYER);
+        validator->setPlayerPosition({ ny, nx });
+
+    }
 
 
 }
