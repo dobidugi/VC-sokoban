@@ -139,13 +139,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Board.h" />
     <ClInclude Include="final.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="player.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="State.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="Validator.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Board.cpp" />
+    <ClCompile Include="Direction.h" />
     <ClCompile Include="final.cpp" />
+    <ClCompile Include="player.cpp" />
+    <ClCompile Include="Validator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="final.rc" />
