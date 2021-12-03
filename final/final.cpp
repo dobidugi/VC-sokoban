@@ -45,7 +45,42 @@ INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
 vector<vector<int>> map;
 pair<int, int> player;
+pair<int, int> mapSize;
 
+int allClearCount = 0;
+int nowClearCount = 0;
+
+
+
+void getMapSize(int stage)
+{
+    string file = to_string(stage) + ".dat";
+    ifstream in;
+    in.open(file);
+    if (!in.is_open()) {
+        std::cout << "파일을 찾을 수 없습니다!" << std::endl;
+    }
+    char buff[30];
+    int tmpX = 0;
+    int tmpY = 0;
+    while (in) {
+        in.getline(buff, 30);
+        for (int z = 0; z < 30; z++) {
+            if (buff[z] == NULL) {
+                break;
+            }
+            else {
+                tmpX++;
+            }
+        }
+        break;
+    }
+    while (in) {
+        in.getline(buff, 30);
+        tmpY++;
+    }
+    mapSize = { tmpY, tmpX };
+}
 
 void loadMap(int stage) {
     string file = to_string(stage) + ".dat";
@@ -55,11 +90,14 @@ void loadMap(int stage) {
     in.open(file);
     if (!in.is_open()) {
         std::cout << "파일을 찾을 수 없습니다!" << std::endl;
+        return;
     }
 
     int i = 0;
     int j = 0;
     bool firstFlag = true;
+
+    getMapSize(1);
     while (in) {
         in.getline(buff, 30);
 
@@ -83,8 +121,12 @@ void loadMap(int stage) {
             else
             {
                 map[i][j] = buff[k] -'0';
-                if (map[i][j] == 9)
+                if (map[i][j] == PLAYER)
                     player = { i, j };
+                if (map[i][j] == CLEAR)
+                    nowClearCount++;
+                if (map[i][j] == NOT_CLEAR || map[i][j] == CLEAR)
+                    allClearCount++;
                 j++;
             }
                
@@ -93,8 +135,8 @@ void loadMap(int stage) {
         j = 0;
     }
 
-    for (int i = 0; i < map.size(); i++) {
-        for (int j = 0; j < map.size(); j++) {
+    for (int i = 0; i < mapSize.first; i++) {
+        for (int j = 0; j < mapSize.second; j++) {
             cout << map[i][j] << " ";
         }
         cout << endl;
@@ -235,6 +277,13 @@ void updatePlayerPosition(int y, int x)
     player = { y , x };
 }
 
+
+void clearCheck()
+{
+    cout << "check HAMSU" << endl;
+    cout << nowClearCount << "/" << allClearCount << endl;
+    if (nowClearCount == allClearCount) cout << "클리어 !!" << endl;
+}
 void move_player(int direction) 
 {
     cout << "move_player" << direction << endl;
@@ -243,7 +292,6 @@ void move_player(int direction)
    
     int nowY = player.first;
     int nowX = player.second;
-    cout << "현재 플레이어 위치" << nowY << " " << nowX << endl;
     int ny = dy[direction] + nowY;
     int nx = dx[direction] + nowX;
 
@@ -265,14 +313,16 @@ void move_player(int direction)
         if (outOfRange(nny, nnx)) return;
         if (!checkMoveKey(nny, nnx)) return;
         
-        if (map[nny][nnx] == NOT_CLEAR)
+        if (map[nny][nnx] == NOT_CLEAR) {
             map[nny][nnx] = CLEAR;
+            nowClearCount++;
+        }   
         else if(map[nny][nnx] == NORMAL)
             map [nny][nnx] = KEY;
         map[player.first][player.second] = NORMAL;
         map[ny][nx] = PLAYER;
         updatePlayerPosition(ny, nx);
-
+        
     }
     
 }
@@ -299,7 +349,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             move_player(MOVE_DOWN);
             break;
         }
-
+        clearCheck();
         InvalidateRect(hWnd, NULL, true);
     }
     break;
@@ -337,11 +387,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             int nY = rectSize;
             int nTop = 0;
             int nBottom = rectSize;
-            for (int i = 1; i <= map.size(); i++) {
-                for (int j = 1; j <= map.size(); j++) {
-                    //int nowState = map[i = 1][j - 1];
-                   /* if (nowState == 1)
-                        SelectObject(hdc, wallBrush);*/
+            for (int i = 1; i <= mapSize.first; i++) {
+                for (int j = 1; j <= mapSize.second; j++) {
                     int nowState = map[i - 1][j - 1];
                     if (nowState == WALL) // 벽 
                     {
