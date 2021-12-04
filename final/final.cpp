@@ -45,6 +45,7 @@ void start(int stage)
     brd->loadStage(stage);
     validator = new Validator(brd);
     player = new Player(validator);
+    
 }
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -158,23 +159,22 @@ RECT nextStageBtn;
 void createCustomButton(HDC hdc)
 {
     WCHAR textBuff[128] = { 0, };
-
     previousStageBtn.left = 1240;
-    previousStageBtn.top = 40;
+    previousStageBtn.top = 60;
     previousStageBtn.right = 1350;
-    previousStageBtn.bottom = 60;
+    previousStageBtn.bottom = 80;
     Rectangle(hdc, previousStageBtn.left, previousStageBtn.top, previousStageBtn.right, previousStageBtn.bottom);
     wsprintfW(textBuff, L"이전스테이지   ");
-    TextOut(hdc, 1240, 40, textBuff, lstrlenW(textBuff));
+    TextOut(hdc, 1240, 60, textBuff, lstrlenW(textBuff));
 
 
     nextStageBtn.left = 1240;
-    nextStageBtn.top = 70;
+    nextStageBtn.top = 90;
     nextStageBtn.right = 1350;
-    nextStageBtn.bottom = 90;
+    nextStageBtn.bottom = 110;
     Rectangle(hdc, nextStageBtn.left, nextStageBtn.top, nextStageBtn.right, nextStageBtn.bottom);
     wsprintfW(textBuff, L"다음스테이지   ");
-    TextOut(hdc, 1240, 70, textBuff, lstrlenW(textBuff));
+    TextOut(hdc, 1240, 90, textBuff, lstrlenW(textBuff));
 }
     
 
@@ -203,7 +203,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             player->moveDown();
             break;
         }
+      
+      
         InvalidateRect(hWnd, NULL, false);
+        if (validator->isEndGame())
+        {
+            MessageBox(hWnd, L"클리어 하였습니다.", L"축하 축하", MB_OK);
+            start(++stage);
+            InvalidateRect(hWnd, NULL, false);
+        }
+           
     }
     break;
     case WM_COMMAND:
@@ -230,8 +239,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_PAINT:
         {
-        cout << "WM_PAINT" << endl;
-            int rectSize = 50;  
+            int rectSize = 0;
+            if (brd->xSize() < 15 && brd->ySize() < 15)
+            {
+                rectSize = 60;
+            }
+            else if(brd->xSize() <20 && brd->ySize() < 20)
+            {
+                rectSize = 40;
+            }
+            else
+            {
+                rectSize = 20;
+            }
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
             // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
@@ -291,12 +311,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             
             WCHAR textBuff[30] = { 0, };
-            wsprintfW(textBuff, L"이동 횟수 : %d", player->getMoveCount());
+            wsprintfW(textBuff, L"이동 횟수 : %d        ", player->getMoveCount());
             TextOut(hdc, 1240, 0, textBuff, lstrlenW(textBuff));
             
-            wsprintfW(textBuff, L"클리어 조건 : %d  / %d",brd->getNowClearCount(), brd->getAllClearCount());
+            wsprintfW(textBuff, L"클리어 조건 : %d  / %d        ",brd->getNowClearCount(), brd->getAllClearCount());
             TextOut(hdc, 1240, 20, textBuff, lstrlenW(textBuff));
             
+            if(brd->isFindFile())
+                wsprintfW(textBuff, L"현재 스테이지 : %d        ", stage);
+            else
+                wsprintfW(textBuff, L"파일을 찾을수 없음");
+            TextOut(hdc, 1240, 40, textBuff, lstrlenW(textBuff));
             createCustomButton(hdc);
             
             EndPaint(hWnd, &ps);
@@ -322,12 +347,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
       
         RECT tmp;
         if (IntersectRect(&tmp, &rect, &previousStageBtn))
-        {
+        {   
             start(--stage);
+            if (!brd->isFindFile())
+            {
+                start(++stage);
+            }
+                
         }
         if (IntersectRect(&tmp, &rect, &nextStageBtn))
         {
             start(++stage);
+            if (!brd->isFindFile())
+            {
+                start(--stage);
+            }
+               
         }
 
         InvalidateRect(hWnd, NULL, true);

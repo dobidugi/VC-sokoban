@@ -17,6 +17,7 @@ public:
 	int getNowClearCount() const;
 	int getAllClearCount() const;
 	void addNowClearCount();
+	bool isFindFile() const;
 private:
 	vector<vector<State>> map;
 	pair<int, int> mapSize;
@@ -25,4 +26,6 @@ private:
 	int allClearCount;
 	void calcStageSize(int stage);
 	void draw();
+	bool fileFlag;
+	int mapMaxSize = 100;
 };

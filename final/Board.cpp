@@ -60,15 +60,14 @@ void Board::calcStageSize(int stage)
     string file = to_string(stage) + ".dat";
     ifstream in;
     in.open(file);
-    if (!in.is_open()) {
-        std::cout << "파일을 찾을 수 없습니다!" << std::endl;
-    }
-    char buff[30];
+
+ 
+    char* buff = new char[this->mapMaxSize];
     int tmpX = 0;
     int tmpY = 0;
     while (in) {
-        in.getline(buff, 30);
-        for (int z = 0; z < 30; z++) {
+        in.getline(buff, mapMaxSize);
+        for (int z = 0; z < mapMaxSize; z++) {
             if (buff[z] == NULL) {
                 break;
             }
@@ -79,23 +78,25 @@ void Board::calcStageSize(int stage)
         break;
     }
     while (in) {
-        in.getline(buff, 30);
+        in.getline(buff, mapMaxSize);
         tmpY++;
     }
     this->mapSize = { tmpY, tmpX };
     this->map.resize(tmpY, vector<State>(tmpX, State::NORMAL));
+    delete buff;
 }
 
 void Board::loadStage(int stage) {
     string file = to_string(stage) + ".dat";
     ifstream in;
     string s;
-    char buff[30];
+    char* buff = new char[mapMaxSize];
     in.open(file);
     if (!in.is_open()) {
-        std::cout << "파일을 찾을 수 없습니다!" << std::endl;
+        fileFlag = false;
         return;
     }
+    fileFlag = true;
     int i = 0;
     int j = 0;
     this->calcStageSize(stage);
@@ -104,8 +105,8 @@ void Board::loadStage(int stage) {
     allClearCount = 0;
 
     while (in) {
-        in.getline(buff, 30);
-        for (int k = 0; k < 30; k++) {
+        in.getline(buff, mapMaxSize);
+        for (int k = 0; k < mapMaxSize; k++) {
             if (buff[k] == NULL)
                 break;
             else
@@ -172,6 +173,8 @@ void Board::loadStage(int stage) {
         }
         cout << endl;
     }
+
+    delete buff;
 }
 
 bool Board::isOutOfRange(int y, int x)
@@ -214,4 +217,9 @@ int Board::getAllClearCount() const
 void Board::addNowClearCount()
 {
     this->nowClearCount++;
+}
+
+bool Board::isFindFile() const
+{
+    return this->fileFlag;
 }
