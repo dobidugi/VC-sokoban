@@ -32,125 +32,10 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
-
-//
-//#define PLAYER 9
-//#define NORMAL 0
-//#define WALL 1
-//#define KEY 2
-//#define NOT_CLEAR 3
-//#define CLEAR 4
-
-
-#define MOVE_UP 0
-#define MOVE_DOWN 1
-#define MOVE_LEFT 2
-#define MOVE_RIGHT 3
-
-
+\
 Board*brd;
 Player *player;
-vector<vector<int>> map;
-pair<int, int> user;
-pair<int, int> mapSize;
 
-int allClearCount = 0;
-int nowClearCount = 0;
-
-
-
-//void getMapSize(int stage)
-//{
-//    string file = to_string(stage) + ".dat";
-//    ifstream in;
-//    in.open(file);
-//    if (!in.is_open()) {
-//        std::cout << "파일을 찾을 수 없습니다!" << std::endl;
-//    }
-//    char buff[30];
-//    int tmpX = 0;
-//    int tmpY = 0;
-//    while (in) {
-//        in.getline(buff, 30);
-//        for (int z = 0; z < 30; z++) {
-//            if (buff[z] == NULL) {
-//                break;
-//            }
-//            else {
-//                tmpX++;
-//            }
-//        }
-//        break;
-//    }
-//    while (in) {
-//        in.getline(buff, 30);
-//        tmpY++;
-//    }
-//    mapSize = { tmpY, tmpX };
-//}
-//
-//void loadMap(int stage) {
-//    string file = to_string(stage) + ".dat";
-//    ifstream in;
-//    string s;
-//    char buff[30];
-//    in.open(file);
-//    if (!in.is_open()) {
-//        std::cout << "파일을 찾을 수 없습니다!" << std::endl;
-//        return;
-//    }
-//
-//    int i = 0;
-//    int j = 0;
-//    bool firstFlag = true;
-//
-//    getMapSize(1);
-//    while (in) {
-//        in.getline(buff, 30);
-//
-//        if (firstFlag) { // 맵의 크기를 구해주기위해
-//            int size = 0;
-//            for (int z = 0; z < 30; z++) {
-//                if (buff[z] == NULL) {
-//                    break;
-//                }
-//                else {
-//                    size++;
-//                }
-//            }
-//
-//            map.resize(size, vector<int>(size,0));
-//            firstFlag = false;
-//        }
-//        for (int k = 0; k < 30; k++) {
-//            if (buff[k] == NULL )
-//                break;
-//            else
-//            {
-//                map[i][j] = buff[k] -'0';
-//                if (map[i][j] == PLAYER)
-//                    user = { i, j };
-//                if (map[i][j] == CLEAR)
-//                    nowClearCount++;
-//                if (map[i][j] == NOT_CLEAR || map[i][j] == CLEAR)
-//                    allClearCount++;
-//                j++;
-//            }
-//               
-//        }
-//        i++;
-//        j = 0;
-//    }
-//
-//    for (int i = 0; i < mapSize.first; i++) {
-//        for (int j = 0; j < mapSize.second; j++) {
-//            cout << map[i][j] << " ";
-//        }
-//        cout << endl;
-//    }
-//
-//    cout << "읽기끝";
-//}
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
                      _In_ LPWSTR    lpCmdLine,
@@ -263,78 +148,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 //
 //
-//bool outOfRange(int y, int x)
-//{
-//    if (y < 0 || y >= map.size() || x < 0 || x >= map.size()) return true;
-//    return  false;
-//}
-//
-//bool checkMovePlayer(int y, int x)
-//{
-//    if (map[y][x] == WALL || map[y][x] == NOT_CLEAR || map[y][x] == CLEAR) return false;
-//    return true;
-//}
-//
-//bool checkMoveKey(int y, int x)
-//{
-//    if (map[y][x] == WALL || map[y][x] == CLEAR ) return false;
-//    return true;
-//}
-
-void updatePlayerPosition(int y, int x)
-{
-    user = { y , x };
-}
 
 
-void clearCheck()
-{
-    cout << "check HAMSU" << endl;
-    cout << nowClearCount << "/" << allClearCount << endl;
-    if (nowClearCount == allClearCount) cout << "클리어 !!" << endl;
-}
-//void move_user(int direction) 
-//{
-//    cout << "move_user" << direction << endl;
-//    int dy[] = { -1, 1, 0, 0 };
-//    int dx[] = { 0, 0, -1, 1 };
-//   
-//    int nowY = user.first;
-//    int nowX = user.second;
-//    int ny = dy[direction] + nowY;
-//    int nx = dx[direction] + nowX;
-//
-//    if (outOfRange(ny,nx)) return;
-//    if (!checkMovePlayer(ny, nx)) return;
-//    
-//    if (map[ny][nx] == NORMAL)
-//    {
-//        map[nowY][nowX] = NORMAL;
-//        map[ny][nx] = PLAYER;
-//        user = { ny , nx };
-//        updatePlayerPosition(ny, nx);
-//    }
-//      
-//    else if (map[ny][nx] == KEY)
-//    {
-//        int nny = dy[direction] + ny;
-//        int nnx = dx[direction] + nx;
-//        if (outOfRange(nny, nnx)) return;
-//        if (!checkMoveKey(nny, nnx)) return;
-//        
-//        if (map[nny][nnx] == NOT_CLEAR) {
-//            map[nny][nnx] = CLEAR;
-//            nowClearCount++;
-//        }   
-//        else if(map[nny][nnx] == NORMAL)
-//            map [nny][nnx] = KEY;
-//        map[user.first][user.second] = NORMAL;
-//        map[ny][nx] = PLAYER;
-//        updatePlayerPosition(ny, nx);
-//        
-//    }
-//    
-//}
+
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -358,7 +174,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             player->moveDown();
             break;
         }
-        clearCheck();
         InvalidateRect(hWnd, NULL, false);
     }
     break;
