@@ -36,7 +36,17 @@ INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 Board*brd;
 Player *player;
 Validator* validator;
-int stage = 2;
+
+int stage = 1;
+
+void start(int stage)
+{
+    brd = new Board();
+    brd->loadStage(stage);
+    validator = new Validator(brd);
+    player = new Player(validator);
+}
+
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
                      _In_ LPWSTR    lpCmdLine,
@@ -46,13 +56,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(lpCmdLine);
 
     // TODO: 여기에 코드를 입력합니다.
-    brd = new Board();
-    brd->loadStage(stage);
-    validator = new Validator(brd);
-    player = new Player(validator);
- 
-    cout << "test" << endl;
-    
+    start(stage);
 
     // 전역 문자열을 초기화합니다.
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -126,7 +130,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
       CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
-
    if (!hWnd)
    {
       return FALSE;
@@ -150,15 +153,40 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 //
 
+RECT previousStageBtn;
+RECT nextStageBtn;
+void createCustomButton(HDC hdc)
+{
+    WCHAR textBuff[128] = { 0, };
 
+    previousStageBtn.left = 1240;
+    previousStageBtn.top = 40;
+    previousStageBtn.right = 1350;
+    previousStageBtn.bottom = 60;
+    Rectangle(hdc, previousStageBtn.left, previousStageBtn.top, previousStageBtn.right, previousStageBtn.bottom);
+    wsprintfW(textBuff, L"이전스테이지   ");
+    TextOut(hdc, 1240, 40, textBuff, lstrlenW(textBuff));
+
+
+    nextStageBtn.left = 1240;
+    nextStageBtn.top = 70;
+    nextStageBtn.right = 1350;
+    nextStageBtn.bottom = 90;
+    Rectangle(hdc, nextStageBtn.left, nextStageBtn.top, nextStageBtn.right, nextStageBtn.bottom);
+    wsprintfW(textBuff, L"다음스테이지   ");
+    TextOut(hdc, 1240, 70, textBuff, lstrlenW(textBuff));
+}
+    
 
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    
     switch (message)
     {
-    case WM_KEYDOWN :
+    case WM_KEYDOWN:
     {
+        cout << "WM_KEYDOWN" << endl;
         switch (wParam)
         {
         case VK_LEFT:
@@ -184,12 +212,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             // 메뉴 선택을 구문 분석합니다:
             switch (wmId)
             {
+            case 0x1001:
+                cout << " click";
+               /* return DefWindowProc(hWnd, message, wParam, lParam);*/
+                break;
             case IDM_ABOUT:
                 DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
                 break;
             case IDM_EXIT:
                 DestroyWindow(hWnd);
                 break;
+            
             default:
                 return DefWindowProc(hWnd, message, wParam, lParam);
             }
@@ -197,6 +230,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_PAINT:
         {
+        cout << "WM_PAINT" << endl;
             int rectSize = 50;  
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
@@ -262,7 +296,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             
             wsprintfW(textBuff, L"클리어 조건 : %d  / %d",brd->getNowClearCount(), brd->getAllClearCount());
             TextOut(hdc, 1240, 20, textBuff, lstrlenW(textBuff));
-
+            
+            createCustomButton(hdc);
+            
             EndPaint(hWnd, &ps);
             DeleteObject(wallBrush);
             DeleteObject(normalBrush);
@@ -272,6 +308,33 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             DeleteObject(clearBrush);
         }
         break;
+    case WM_LBUTTONDOWN:
+    {
+        HDC hdc = GetDC(hWnd);
+        int x = LOWORD(lParam);
+        int y = HIWORD(lParam);
+        RECT rect;
+        rect.left = x;
+        rect.top = y;
+        rect.right = x + 1;
+        rect.bottom = y + 1;
+        Rectangle(hdc, rect.left, rect.top, rect.right, rect.bottom);
+      
+        RECT tmp;
+        if (IntersectRect(&tmp, &rect, &previousStageBtn))
+        {
+            start(--stage);
+        }
+        if (IntersectRect(&tmp, &rect, &nextStageBtn))
+        {
+            start(++stage);
+        }
+
+        InvalidateRect(hWnd, NULL, true);
+        ReleaseDC(hWnd, hdc);
+    }   
+        break;
+
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
