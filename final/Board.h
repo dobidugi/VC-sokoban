@@ -10,16 +10,19 @@ public:
 	int xSize() const;
 	void update(int y, int x, State value);
 	void loadStage(int stage);
-	bool isMovedPlayer(int y, int x);
 	State nowPositionState(int y, int x);
 	pair<int, int> getPlayerPosition();
 	void setPlayerPosition(pair<int, int> pos);
 	bool isOutOfRange(int y, int x);
+	int getNowClearCount() const;
+	int getAllClearCount() const;
+	void addNowClearCount();
 private:
 	vector<vector<State>> map;
 	pair<int, int> mapSize;
 	pair<int, int> playerPos;
-	
+	int nowClearCount;
+	int allClearCount;
 	void calcStageSize(int stage);
 	void draw();
 };

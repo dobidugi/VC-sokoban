@@ -6,6 +6,8 @@
 Player::Player(Validator *validator)
 {
     this->validator = validator;
+    lock = false;
+    moveCount = 0;
 }
 
 Player::~Player()
@@ -37,6 +39,8 @@ void Player::moveRight()
 void Player::move(int direction)
 {
   
+    if (lock) return;
+    moveCount++;
     int dy[] = { -1, 1, 0, 0 };
     int dx[] = { 0, 0, -1, 1 };
 
@@ -63,7 +67,7 @@ void Player::move(int direction)
         if (validator->isNowPositionStateNotClear(nny, nnx))
         {
             validator->updateBoard(nny, nnx, State::CLEAR);
-            //nowClearCount++;
+            validator->addNowClearCount();
         }
 
         else if (validator->isNowPositionStateNormal(nny, nnx))
@@ -76,6 +80,14 @@ void Player::move(int direction)
         validator->setPlayerPosition({ ny, nx });
 
     }
+    if (validator->isEndGame())
+    {
+        lock = true;
+    }
 
+}
 
+int Player::getMoveCount() const
+{
+    return this->moveCount;
 }

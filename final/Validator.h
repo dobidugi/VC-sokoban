@@ -11,7 +11,9 @@ public:
 	bool isNowPositionStateNotClear(int y, int x);
 	void updateBoard(int y, int x, State value);
 	void setPlayerPosition(pair<int, int>);
+	bool isEndGame();
 	pair<int, int> getPlayerPosition() const;
+	void addNowClearCount();
 private:
 	Board* board;
 };

@@ -12,7 +12,10 @@ public:
 	void moveRight();
 	void moveUp();
 	void moveDown();
+	int getMoveCount() const;
 private:
 	Validator*  validator;
 	void move(int direction);
+	bool lock;
+	int moveCount;
 };

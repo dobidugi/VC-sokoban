@@ -96,10 +96,13 @@ void Board::loadStage(int stage) {
         std::cout << "파일을 찾을 수 없습니다!" << std::endl;
         return;
     }
-
     int i = 0;
     int j = 0;
-    this->calcStageSize(1);
+    this->calcStageSize(stage);
+
+    nowClearCount = 0;
+    allClearCount = 0;
+
     while (in) {
         in.getline(buff, 30);
         for (int k = 0; k < 30; k++) {
@@ -111,28 +114,29 @@ void Board::loadStage(int stage) {
                 switch (buff[k] - '0')
                 {
                 case 0:
-                    this->map[i][j] = State::NORMAL;
+                    this->map[i][k] = State::NORMAL;
                     break;
                 case 1:
-                    this->map[i][j] = State::WALL;
+                    this->map[i][k] = State::WALL;
                     break;
                 case 2:
-                    this->map[i][j] = State::KEY;
+                    this->map[i][k] = State::KEY;
                     break;
                 case 3:
-                    this->map[i][j] = State::NOT_CLEAR;
+                    this->map[i][k] = State::NOT_CLEAR;
+                    allClearCount++;
                     break;
                 case 4:
-                    this->map[i][j] = State::CLEAR;
-                    // nowClaearCount ++
+                    this->map[i][k] = State::CLEAR;
+                    allClearCount++;
+                    nowClearCount++;
                     break;
                 case 9:
-                    this->playerPos = { i, j };
-                    this->map[i][j] = State::PLAYER;
+                    this->playerPos = { i, k };
+                    this->map[i][k] = State::PLAYER;
                     break;
-                   // if (this->map[i][j] == State::NOT_CLEAR || this->map[i][j] == State::CLEAR)
-                     //   allClearCount++;
                 }
+              
                 j++;
             }
 
@@ -195,4 +199,19 @@ pair<int, int> Board::getPlayerPosition()
 void Board::setPlayerPosition(pair<int, int> pos)
 {
     this->playerPos = pos;
+}
+
+int Board::getNowClearCount() const
+{
+    return nowClearCount;
+}
+
+int Board::getAllClearCount() const
+{
+    return allClearCount;
+}
+
+void Board::addNowClearCount()
+{
+    this->nowClearCount++;
 }

@@ -32,10 +32,11 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
-\
+
 Board*brd;
 Player *player;
-
+Validator* validator;
+int stage = 2;
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
                      _In_ LPWSTR    lpCmdLine,
@@ -46,8 +47,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     // TODO: 여기에 코드를 입력합니다.
     brd = new Board();
-    brd->loadStage(1);
-    Validator* validator = new Validator(brd);
+    brd->loadStage(stage);
+    validator = new Validator(brd);
     player = new Player(validator);
  
     cout << "test" << endl;
@@ -253,6 +254,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 nTop = nTop + rectSize;
                 nBottom = nBottom + rectSize;
             }
+
+            
+            WCHAR textBuff[30] = { 0, };
+            wsprintfW(textBuff, L"이동 횟수 : %d", player->getMoveCount());
+            TextOut(hdc, 1240, 0, textBuff, lstrlenW(textBuff));
+            
+            wsprintfW(textBuff, L"클리어 조건 : %d  / %d",brd->getNowClearCount(), brd->getAllClearCount());
+            TextOut(hdc, 1240, 20, textBuff, lstrlenW(textBuff));
+
             EndPaint(hWnd, &ps);
             DeleteObject(wallBrush);
             DeleteObject(normalBrush);
