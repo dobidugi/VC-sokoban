@@ -13,5 +13,5 @@ public:
 private:
 	Board* board;
 	Player* player;
-	stack<pair<vector<vector<State>>, int>> stack;
+	stack<pair<vector<vector<State>>, pair<int, int>>> stack;
 };

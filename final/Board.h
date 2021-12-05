@@ -18,6 +18,7 @@ public:
 	int getAllClearCount() const;
 	void addNowClearCount();
 	bool isFindFile() const;
+	void setNowClearCount(int count);
 private:
 	vector<vector<State>> map;
 	pair<int, int> mapSize;

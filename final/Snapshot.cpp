@@ -22,8 +22,8 @@ void Snapshot::capture()
 			tmp[i][j] = board->nowPositionState(i, j);
 		}
 	}
-	int tmpCount = player->getMoveCount();
-	stack.push({ tmp, tmpCount});
+	
+	stack.push({ tmp, {player->getMoveCount() , board->getNowClearCount()} });
 	cout << "capture";
 }
 
@@ -34,7 +34,8 @@ void Snapshot::rollback()
 	if (!stack.empty())
 	{
 		vector<vector<State>> tmpMap = stack.top().first;
-		int tmpCount = stack.top().second;
+		int tmpCount = stack.top().second.first;
+		int tmpClearCount = stack.top().second.second;
 		stack.pop();
 		for (int i = 0; i <y; i++)
 		{
@@ -48,6 +49,7 @@ void Snapshot::rollback()
 			}
 		}
 		player->setMoveCount(tmpCount);
+		board->setNowClearCount(tmpClearCount);
 	}
 	
 }

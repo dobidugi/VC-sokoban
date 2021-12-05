@@ -166,3 +166,9 @@ bool Board::isFindFile() const
 {
     return this->fileFlag;
 }
+
+
+void Board::setNowClearCount(int count)
+{
+    this->nowClearCount = count;
+}
