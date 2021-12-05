@@ -23,35 +23,7 @@ int Board::xSize() const
 
 void Board::update(int y, int x, State value)
 {
-	this->map[y][x] = value;
-    for (int i = 0; i < this->ySize(); i++)
-    {
-        for (int j = 0; j < this->xSize(); j++)
-        {
-            switch (map[i][j])
-            {
-            case State::WALL:
-                cout << "1";
-                break;
-            case State::NORMAL:
-                cout << "0";
-                break;
-            case State::PLAYER:
-                cout << "9";
-                break;
-            case State::KEY:
-                cout << "2";
-                break;
-            case State::NOT_CLEAR:
-                cout << "3";
-                break;
-            case State::CLEAR:
-                cout << "4";
-                break;
-            }
-        }
-        cout << endl;
-    }
+	this->map[y][x] = value
 }
 
 
@@ -83,7 +55,7 @@ void Board::calcStageSize(int stage)
     }
     this->mapSize = { tmpY, tmpX };
     this->map.resize(tmpY, vector<State>(tmpX, State::NORMAL));
-    delete buff;
+    delete[] buff;
 }
 
 void Board::loadStage(int stage) {
@@ -145,36 +117,8 @@ void Board::loadStage(int stage) {
         i++;
         j = 0;
     }
-    for (int i = 0; i < this->ySize(); i++)
-    {
-        for (int j = 0; j < this->xSize(); j++)
-        {
-            switch (map[i][j])
-            {
-            case State::WALL:
-                cout << "1";
-                break;
-            case State::NORMAL:
-                cout << "0";
-                break;
-            case State::PLAYER:
-                cout << "9";
-                break;
-            case State::KEY:
-                cout << "2";
-                break;
-            case State::NOT_CLEAR:
-                cout << "3";
-                break;
-            case State::CLEAR:
-                cout << "4";
-                break;
-            }
-        }
-        cout << endl;
-    }
 
-    delete buff;
+    delete[] buff;
 }
 
 bool Board::isOutOfRange(int y, int x)

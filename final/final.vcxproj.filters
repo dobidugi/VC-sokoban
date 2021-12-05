@@ -39,6 +39,9 @@
     <ClInclude Include="Validator.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Snapshot.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="final.cpp">
@@ -51,6 +54,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Validator.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Snapshot.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

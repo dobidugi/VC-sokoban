@@ -91,3 +91,8 @@ int Player::getMoveCount() const
 {
     return this->moveCount;
 }
+
+void Player::setMoveCount(int count)
+{
+    this->moveCount = count;
+}

@@ -10,8 +10,9 @@
 
 #include "board.h"
 #include "player.h"
-#include "Direction.h"
+
 #include "Validator.h"
+#include "Snapshot.h"
 
 #define MAX_LOADSTRING 10
 using namespace std;
@@ -36,7 +37,7 @@ INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 Board*brd;
 Player *player;
 Validator* validator;
-
+Snapshot* snapshot;
 int stage = 1;
 
 void start(int stage)
@@ -45,6 +46,7 @@ void start(int stage)
     brd->loadStage(stage);
     validator = new Validator(brd);
     player = new Player(validator);
+    snapshot = new Snapshot(brd, player);
     
 }
 
@@ -156,25 +158,37 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 RECT previousStageBtn;
 RECT nextStageBtn;
+RECT rollbackBtn;
 void createCustomButton(HDC hdc)
 {
     WCHAR textBuff[128] = { 0, };
-    previousStageBtn.left = 1240;
+    const int LEFT = 1240;
+    const int RIGHT = 1350;
+    previousStageBtn.left = LEFT;
     previousStageBtn.top = 60;
-    previousStageBtn.right = 1350;
+    previousStageBtn.right = RIGHT;
     previousStageBtn.bottom = 80;
     Rectangle(hdc, previousStageBtn.left, previousStageBtn.top, previousStageBtn.right, previousStageBtn.bottom);
     wsprintfW(textBuff, L"이전스테이지   ");
-    TextOut(hdc, 1240, 60, textBuff, lstrlenW(textBuff));
+    TextOut(hdc, LEFT, 60, textBuff, lstrlenW(textBuff));
 
 
-    nextStageBtn.left = 1240;
+    nextStageBtn.left = LEFT;
     nextStageBtn.top = 90;
-    nextStageBtn.right = 1350;
+    nextStageBtn.right =  RIGHT;
     nextStageBtn.bottom = 110;
     Rectangle(hdc, nextStageBtn.left, nextStageBtn.top, nextStageBtn.right, nextStageBtn.bottom);
     wsprintfW(textBuff, L"다음스테이지   ");
-    TextOut(hdc, 1240, 90, textBuff, lstrlenW(textBuff));
+    TextOut(hdc, LEFT, 90, textBuff, lstrlenW(textBuff));
+
+    rollbackBtn.left = LEFT;
+    rollbackBtn.top = 130;
+    rollbackBtn.right = RIGHT;
+    rollbackBtn.bottom = 150;
+    Rectangle(hdc, rollbackBtn.left, rollbackBtn.top, rollbackBtn.right, rollbackBtn.bottom);
+    wsprintfW(textBuff, L"되돌리기           ");
+    TextOut(hdc, LEFT, 130, textBuff, lstrlenW(textBuff));
+
 }
     
 
@@ -186,31 +200,36 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
     case WM_KEYDOWN:
     {
-        cout << "WM_KEYDOWN" << endl;
+       
         switch (wParam)
         {
         case VK_LEFT:
+            snapshot->capture();
             player->moveLeft();
             break;
 
         case VK_RIGHT:
+            snapshot->capture();
             player->moveRight();
             break;
         case VK_UP:
+            snapshot->capture();
             player->moveUp();
             break;
         case VK_DOWN:
+            snapshot->capture();
             player->moveDown();
             break;
         }
       
       
-        InvalidateRect(hWnd, NULL, false);
+
+        InvalidateRect(hWnd, NULL, true);
         if (validator->isEndGame())
         {
             MessageBox(hWnd, L"클리어 하였습니다.", L"축하 축하", MB_OK);
             start(++stage);
-            InvalidateRect(hWnd, NULL, false);
+            InvalidateRect(hWnd, NULL, true);
         }
            
     }
@@ -364,6 +383,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
                
         }
+        if (IntersectRect(&tmp, &rect, &rollbackBtn))
+        {
+            cout << "click";
+            snapshot->rollback();
+        }
+  
 
         InvalidateRect(hWnd, NULL, true);
         ReleaseDC(hWnd, hdc);
