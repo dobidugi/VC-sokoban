@@ -23,7 +23,7 @@ int Board::xSize() const
 
 void Board::update(int y, int x, State value)
 {
-	this->map[y][x] = value
+    this->map[y][x] = value;
 }
 
 
@@ -83,7 +83,6 @@ void Board::loadStage(int stage) {
                 break;
             else
             {
-                cout << buff[k];
                 switch (buff[k] - '0')
                 {
                 case 0:

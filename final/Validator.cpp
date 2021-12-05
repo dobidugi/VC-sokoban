@@ -62,7 +62,6 @@ pair<int, int> Validator::getPlayerPosition() const
 
 bool Validator::isEndGame()
 {
-	cout << board->getNowClearCount() << " / " << board->getAllClearCount() << endl;
 	return board->getAllClearCount() == board->getNowClearCount(); 
 }
 
