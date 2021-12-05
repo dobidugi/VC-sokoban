@@ -14,6 +14,14 @@
 #include "Validator.h"
 #include "Snapshot.h"
 
+#include <windows.h>
+#include <objidl.h>
+#include <gdiplus.h>
+using namespace Gdiplus;
+#pragma comment (lib,"Gdiplus.lib")
+ULONG_PTR gdiplusToken;
+GdiplusStartupInput gdiplusStartupInput;
+
 #define MAX_LOADSTRING 10
 using namespace std;
 
@@ -22,6 +30,7 @@ using namespace std;
 #else
 #pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
 #endif
+
 
 // 전역 변수:
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
@@ -60,6 +69,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     // TODO: 여기에 코드를 입력합니다.
     start(stage);
+    GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 
     // 전역 문자열을 초기화합니다.
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -278,51 +288,54 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             notClearBrush = CreateSolidBrush(RGB(255, 0, 0));
             keyBrush = CreateSolidBrush(RGB(255, 255, 0));
             clearBrush = CreateSolidBrush(RGB(0, 255, 0));
-            int nX = 0;
-            int nY = rectSize;
-            int nTop = 0;
-            int nBottom = rectSize;
-            for (int i = 1; i <= brd->ySize(); i++) {
-                for (int j = 1; j <= brd->xSize(); j++) {
-                    State nowState = brd->nowPositionState(i-1, j-1); //[i - 1] [j - 1] ;
+            Image* wall = Image::FromFile(L"wall.png");
+            Image* road = Image::FromFile(L"road.png");
+            Image* human = Image::FromFile(L"player.png");
+            Image* empty = Image::FromFile(L"empty.png"); // not clear
+            Image* key = Image::FromFile(L"key.png");
+            Image* clear = Image::FromFile(L"clear.png");
+            ::Graphics g(hdc);
+           
+            int tmpI = 0;
+            int tmpJ = 0;
+            for (int i = 1; i <= brd->ySize() * rectSize; i+=rectSize) 
+            {
+                tmpJ = 0;
+                for (int j = 1; j <= brd->xSize() * rectSize; j+=rectSize) 
+                {
+          
+                    State nowState = brd->nowPositionState(tmpI,tmpJ++);
                     if (nowState == State::WALL) // 벽 
                     {
-                        SelectObject(hdc, wallBrush);
-                        Rectangle(hdc, nX, nTop, nY, nBottom);
+                        g.DrawImage(wall, j, i, rectSize, rectSize);
                     }
                     else if(nowState == State::NORMAL) // 이동가능한곳
                     {
-                        SelectObject(hdc, normalBrush);
-                        Rectangle(hdc, nX, nTop, nY, nBottom);
+                        g.DrawImage(road, j, i, rectSize, rectSize);
                     }
                     else if (nowState == State::PLAYER) // Player
                     {
-                        
-                        SelectObject(hdc, userBrush);
-                        Rectangle(hdc, nX, nTop, nY, nBottom);
+                        g.DrawImage(human, j, i, rectSize, rectSize);
+
                     }
                     else if (nowState == State::KEY) // key
                     {
-                        SelectObject(hdc, keyBrush);
-                        Rectangle(hdc, nX, nTop, nY, nBottom);
+     
+                        g.DrawImage(key, j, i, rectSize, rectSize);
+ 
                     }
                     else if (nowState == State::NOT_CLEAR) // notClear
                     {
-                        SelectObject(hdc, notClearBrush);
-                        Rectangle(hdc, nX, nTop, nY, nBottom);
+                        g.DrawImage(empty, j, i, rectSize, rectSize);
+
                     }
                     else if (nowState == State::CLEAR) // clear
                     {
-                        SelectObject(hdc, clearBrush);
-                        Rectangle(hdc, nX, nTop, nY, nBottom);
-                    }
-                    nX = nX + rectSize;
-                    nY = nY + rectSize;
+                        g.DrawImage(clear, j, i, rectSize, rectSize);
+                    }     
                 }
-                nX = 0;
-                nY = rectSize;
-                nTop = nTop + rectSize;
-                nBottom = nBottom + rectSize;
+                tmpI++;
+
             }
 
             
@@ -340,6 +353,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             TextOut(hdc, 1240, 40, textBuff, lstrlenW(textBuff));
             createCustomButton(hdc);
             
+            
+          
+
+
+          
             EndPaint(hWnd, &ps);
             DeleteObject(wallBrush);
             DeleteObject(normalBrush);
@@ -347,6 +365,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             DeleteObject(keyBrush);
             DeleteObject(notClearBrush);
             DeleteObject(clearBrush);
+            delete wall;
+            delete road;
+            delete key;
+            delete human;
+            delete empty;
+            delete clear;
         }
         break;
     case WM_LBUTTONDOWN:
