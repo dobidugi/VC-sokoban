@@ -281,13 +281,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
             // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
-            HBRUSH wallBrush, normalBrush, userBrush, keyBrush, notClearBrush, clearBrush;
-            wallBrush = CreateSolidBrush(RGB(100, 0, 0));
-            normalBrush = CreateSolidBrush(RGB(255, 255, 255));
-            userBrush = CreateSolidBrush(RGB(0, 0, 255));
-            notClearBrush = CreateSolidBrush(RGB(255, 0, 0));
-            keyBrush = CreateSolidBrush(RGB(255, 255, 0));
-            clearBrush = CreateSolidBrush(RGB(0, 255, 0));
             Image* wall = Image::FromFile(L"wall.png");
             Image* road = Image::FromFile(L"road.png");
             Image* human = Image::FromFile(L"player.png");
@@ -353,18 +346,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             TextOut(hdc, 1240, 40, textBuff, lstrlenW(textBuff));
             createCustomButton(hdc);
             
-            
-          
 
-
-          
             EndPaint(hWnd, &ps);
-            DeleteObject(wallBrush);
-            DeleteObject(normalBrush);
-            DeleteObject(userBrush);
-            DeleteObject(keyBrush);
-            DeleteObject(notClearBrush);
-            DeleteObject(clearBrush);
             delete wall;
             delete road;
             delete key;
