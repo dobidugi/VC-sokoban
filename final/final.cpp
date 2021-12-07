@@ -283,7 +283,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
             Image* wall = Image::FromFile(L"wall.png");
             Image* road = Image::FromFile(L"road.png");
-            Image* human = Image::FromFile(L"player.png");
+            Image* playerUp = Image::FromFile(L"player_up.png");
+            Image* playerDown = Image::FromFile(L"player_down.png");
+            Image* playerLeft = Image::FromFile(L"player_left.png");
+            Image* playerRight = Image::FromFile(L"player_right.png");
             Image* empty = Image::FromFile(L"empty.png"); // not clear
             Image* key = Image::FromFile(L"key.png");
             Image* clear = Image::FromFile(L"clear.png");
@@ -308,7 +311,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     }
                     else if (nowState == State::PLAYER) // Player
                     {
-                        g.DrawImage(human, j, i, rectSize, rectSize);
+                        if (player->getNowDirection() == 0)
+                            g.DrawImage(playerUp, j, i, rectSize, rectSize);
+                        else if (player->getNowDirection() == 1)
+                            g.DrawImage(playerDown, j, i, rectSize, rectSize);
+                        else if (player->getNowDirection() == 2)
+                            g.DrawImage(playerLeft, j, i, rectSize, rectSize);
+                        else if (player->getNowDirection() == 3)
+                            g.DrawImage(playerRight, j, i, rectSize, rectSize);
 
                     }
                     else if (nowState == State::KEY) // key
@@ -351,7 +361,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             delete wall;
             delete road;
             delete key;
-            delete human;
+            delete playerUp;
+            delete playerDown;
+            delete playerLeft;
+            delete playerRight;
             delete empty;
             delete clear;
         }

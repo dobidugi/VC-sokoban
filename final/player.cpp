@@ -8,6 +8,7 @@ Player::Player(Validator *validator)
     this->validator = validator;
     lock = false;
     moveCount = 0;
+    direction = 1;
 }
 
 Player::~Player()
@@ -40,6 +41,7 @@ void Player::move(int direction)
 {
   
     if (lock) return;
+    this->direction = direction;
     moveCount++;
     int dy[] = { -1, 1, 0, 0 };
     int dx[] = { 0, 0, -1, 1 };
@@ -95,4 +97,9 @@ int Player::getMoveCount() const
 void Player::setMoveCount(int count)
 {
     this->moveCount = count;
+}
+
+int Player::getNowDirection() const
+{
+    return this->direction;
 }

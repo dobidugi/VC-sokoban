@@ -14,9 +14,11 @@ public:
 	void moveDown();
 	int getMoveCount() const;
 	void setMoveCount(int count);
+	int getNowDirection() const;
 private:
 	Validator*  validator;
 	void move(int direction);
 	bool lock;
 	int moveCount;
+	int direction;
 };
