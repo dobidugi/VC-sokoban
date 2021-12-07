@@ -234,12 +234,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
       
       
 
-        InvalidateRect(hWnd, NULL, true);
+        InvalidateRect(hWnd, NULL, false); // 더블버퍼링 해결하기위해서는 FALSE로줘야함 
         if (validator->isEndGame())
         {
             MessageBox(hWnd, L"클리어 하였습니다.", L"축하 축하", MB_OK);
             start(++stage);
-            InvalidateRect(hWnd, NULL, true);
+            InvalidateRect(hWnd, NULL, false); // 더블버퍼링 해결하기위해서는 FALSE로줘야함 
         }
            
     }
@@ -265,12 +265,30 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_PAINT:
         {
+            PAINTSTRUCT ps;
+            HDC hdc = BeginPaint(hWnd, &ps);
+            // 더블 버퍼링 처리시작 
+            static HDC MemDC, tmpDC;
+            static HBITMAP BackBit, oldBackBit;
+            static RECT bufferRT;
+          
+            GetClientRect(hWnd, &bufferRT);
+            MemDC = CreateCompatibleDC(hdc);
+            BackBit = CreateCompatibleBitmap(hdc, bufferRT.right, bufferRT.bottom);
+            oldBackBit = (HBITMAP)SelectObject(MemDC, BackBit);
+            PatBlt(MemDC, 0, 0, bufferRT.right, bufferRT.bottom, WHITENESS);
+            tmpDC = hdc;
+            hdc = MemDC;
+            MemDC = tmpDC;
+         
+          
+            // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
             int rectSize = 0;
             if (brd->xSize() < 15 && brd->ySize() < 15)
             {
                 rectSize = 60;
             }
-            else if(brd->xSize() <20 && brd->ySize() < 20)
+            else if (brd->xSize() < 20 && brd->ySize() < 20)
             {
                 rectSize = 40;
             }
@@ -278,9 +296,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             {
                 rectSize = 20;
             }
-            PAINTSTRUCT ps;
-            HDC hdc = BeginPaint(hWnd, &ps);
-            // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
+
+
             Image* wall = Image::FromFile(L"wall.png");
             Image* road = Image::FromFile(L"road.png");
             Image* playerUp = Image::FromFile(L"player_up.png");
@@ -356,6 +373,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             TextOut(hdc, 1240, 40, textBuff, lstrlenW(textBuff));
             createCustomButton(hdc);
             
+
+
+
+
+         
+
+            GetClientRect(hWnd, &bufferRT);
+            BitBlt(MemDC, 0, 0, bufferRT.right, bufferRT.bottom, hdc, 0, 0, SRCCOPY);
+            SelectObject(hdc, oldBackBit);
+            DeleteObject(BackBit);
+            DeleteDC(hdc);
 
             EndPaint(hWnd, &ps);
             delete wall;
