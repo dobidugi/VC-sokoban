@@ -4,6 +4,7 @@
 #include "Board.h"
 #include "Player.h"
 #include "State.h"
+#include "Data.h"
 class Snapshot
 {
 public:
@@ -13,5 +14,5 @@ public:
 private:
 	Board* board;
 	Player* player;
-	stack<pair<vector<vector<State>>, pair<int, int>>> stack;
+	stack<Data> stack;
 };

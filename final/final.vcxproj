@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Board.h" />
+    <ClInclude Include="Data.h" />
     <ClInclude Include="final.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Player.h" />
@@ -151,6 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Board.cpp" />
+    <ClCompile Include="Data.cpp" />
     <ClCompile Include="final.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Snapshot.cpp" />

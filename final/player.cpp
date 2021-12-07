@@ -103,3 +103,8 @@ int Player::getNowDirection() const
 {
     return this->direction;
 }
+
+void Player::setDirection(int direction)
+{
+    this->direction = direction;
+}

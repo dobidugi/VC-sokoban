@@ -15,6 +15,7 @@ public:
 	int getMoveCount() const;
 	void setMoveCount(int count);
 	int getNowDirection() const;
+	void setDirection(int direction);
 private:
 	Validator*  validator;
 	void move(int direction);

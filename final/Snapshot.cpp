@@ -2,6 +2,7 @@
 #include "Board.h"
 #include "Player.h"
 #include "State.h"
+#include "Data.h"
 Snapshot::Snapshot(Board* board, Player* player)
 {
 	this->board = board;
@@ -23,8 +24,8 @@ void Snapshot::capture()
 		}
 	}
 	
-	stack.push({ tmp, {player->getMoveCount() , board->getNowClearCount()} });
-	cout << "capture";
+	Data* data = new Data(tmp, player->getMoveCount(), player->getNowDirection(), board->getNowClearCount());
+	stack.push(*data);
 }
 
 void Snapshot::rollback()
@@ -33,10 +34,8 @@ void Snapshot::rollback()
 	int x = board->xSize();
 	if (!stack.empty())
 	{
-		vector<vector<State>> tmpMap = stack.top().first;
-		int tmpCount = stack.top().second.first;
-		int tmpClearCount = stack.top().second.second;
-		stack.pop();
+		Data data = stack.top(); stack.pop();
+		vector<vector<State>> tmpMap = data.getMap();
 		for (int i = 0; i <y; i++)
 		{
 			for (int j = 0; j <x; j++)
@@ -48,8 +47,9 @@ void Snapshot::rollback()
 				}
 			}
 		}
-		player->setMoveCount(tmpCount);
-		board->setNowClearCount(tmpClearCount);
+		player->setMoveCount(data.getMoveCount());
+		player->setDirection(data.getDirection());
+		board->setNowClearCount(data.getClearCount());
 	}
 	
 }

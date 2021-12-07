@@ -25,11 +25,6 @@ GdiplusStartupInput gdiplusStartupInput;
 #define MAX_LOADSTRING 10
 using namespace std;
 
-#ifdef UNICODE
-#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
-#else
-#pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
-#endif
 
 
 // 전역 변수:
@@ -234,12 +229,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
       
       
 
-        InvalidateRect(hWnd, NULL, false); // 더블버퍼링 해결하기위해서는 FALSE로줘야함 
+        InvalidateRect(hWnd, NULL, false); // 더블버퍼링 하기위해서는 FALSE로줘야함 
         if (validator->isEndGame())
         {
             MessageBox(hWnd, L"클리어 하였습니다.", L"축하 축하", MB_OK);
             start(++stage);
-            InvalidateRect(hWnd, NULL, false); // 더블버퍼링 해결하기위해서는 FALSE로줘야함 
+            InvalidateRect(hWnd, NULL, false); // 더블버퍼링 하기위해서는 FALSE로줘야함 
         }
            
     }
@@ -434,7 +429,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
   
 
-        InvalidateRect(hWnd, NULL, true);
+        InvalidateRect(hWnd, NULL, false);
         ReleaseDC(hWnd, hdc);
     }   
         break;
