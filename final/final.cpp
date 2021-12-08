@@ -43,6 +43,9 @@ Player *player;
 Validator* validator;
 Snapshot* snapshot;
 int stage = 1;
+bool timerFlag = true;
+int sec, minute;
+HWND g_hWnd;
 
 void start(int stage)
 {
@@ -197,6 +200,36 @@ void createCustomButton(HDC hdc)
 }
     
 
+DWORD WINAPI timer(LPVOID param)
+{
+    HWND hWnd = g_hWnd;
+    HDC hdc = GetDC(hWnd);
+    WCHAR textBuff[128] = { 0, };
+    wsprintfW(textBuff, L"타이머 : %02d : %02d  ", minute, sec);
+    TextOut(hdc, 1240, 160, textBuff, lstrlenW(textBuff));
+    while (!validator->isEndGame())
+    {
+        
+        sec++;
+        if (sec == 60)
+        {
+            sec = 0;
+            minute++;
+        }
+        wsprintfW(textBuff, L"타이머 : %02d : %02d  ", minute, sec);
+        TextOut(hdc, 1240, 160, textBuff, lstrlenW(textBuff));
+        Sleep(1000);
+       
+    }
+
+    sec = 0;
+    minute = 0;
+    timerFlag = true;
+    ExitThread(0);
+    ReleaseDC(hWnd, hdc);
+    
+    return 0;
+}
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -227,7 +260,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             break;
         }
       
-      
+        switch (wParam)
+        {
+        case VK_LEFT:
+        case VK_RIGHT:
+        case VK_UP:
+        case VK_DOWN:
+        {
+            if (timerFlag)
+            {
+                CreateThread(NULL, 0, timer, NULL, 0, NULL);
+                timerFlag = false;
+            }
+        }
+            break;
+        }
+        
 
         InvalidateRect(hWnd, NULL, false); // 더블버퍼링 하기위해서는 FALSE로줘야함 
         if (validator->isEndGame())
@@ -262,6 +310,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
+            g_hWnd = hWnd;
             // 더블 버퍼링 처리시작 
             static HDC MemDC, tmpDC;
             static HBITMAP BackBit, oldBackBit;
@@ -366,13 +415,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             else
                 wsprintfW(textBuff, L"파일을 찾을수 없음");
             TextOut(hdc, 1240, 40, textBuff, lstrlenW(textBuff));
+
+
+            wsprintfW(textBuff, L"타이머 : %02d : %02d  ", minute, sec);
+            TextOut(hdc, 1240, 160, textBuff, lstrlenW(textBuff));
+
+
             createCustomButton(hdc);
-            
-
-
-
-
-         
 
             GetClientRect(hWnd, &bufferRT);
             BitBlt(MemDC, 0, 0, bufferRT.right, bufferRT.bottom, hdc, 0, 0, SRCCOPY);
