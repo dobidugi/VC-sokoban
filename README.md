@@ -62,7 +62,7 @@
 
 ex)
 
-[3.png](./gitimg/3.png)
+[3.png](./gitimg/3-1.png)
 
 ## 제작 과정
 
