@@ -54,6 +54,7 @@ void start(int stage)
     validator = new Validator(brd);
     player = new Player(validator);
     snapshot = new Snapshot(brd, player);
+
     
 }
 
